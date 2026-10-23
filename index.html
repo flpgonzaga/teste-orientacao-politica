@@ -109,7 +109,12 @@ svg text{font-family:"Source Serif 4",Georgia,serif}
 .book .t{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.7rem;line-height:1.04;margin:0 0 4px}
 .book .au{color:var(--ink-2);margin:0 0 12px;font-size:.92rem}
 .book p{font-size:1rem}
-.book .rec{border-left:2px solid var(--accent);padding-left:12px;margin-top:14px}
+.book .rec{border-left:2px solid var(--accent);padding-left:14px;margin-top:18px}
+.book .rec p{margin:0 0 12px}
+.book .rec p:last-child{margin:0}
+.book .rec .w{font-style:italic}
+.book .rec a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:4px}
+.book .rec .lbl{display:block;font-size:.82rem;color:var(--ink-2);margin-bottom:2px}
 @media (max-width:380px){.book{grid-template-columns:84px 1fr}}
 
 .share h3{margin-top:0}
@@ -195,10 +200,10 @@ svg text{font-family:"Source Serif 4",Georgia,serif}
       </div>
       <div>
         <p class="t">Por que pessoas inteligentes discordam</p>
-        <p class="au">Felipe · lançamento em breve</p>
+        <p class="au">Felipe · leitura gratuita online</p>
         <p>Um livro para quem não é especialista e quer entender por que pessoas igualmente inteligentes e bem-intencionadas chegam a conclusões tão diferentes sobre o Estado, a liberdade, a igualdade e a tradição.</p>
         <p>Cada capítulo toma uma dessas disputas, apresenta os argumentos mais fortes de cada lado sem caricatura e termina com situações do Brasil de hoje, pra você testar o que pensa e ouvir os pensadores deste mapa na voz deles.</p>
-        <p class="rec" id="readrec"></p>
+        <div class="rec" id="readrec"></div>
       </div>
     </div>
   </div>
@@ -289,6 +294,20 @@ const AXES = {
     posTxt:"Você vê nos costumes herdados uma sabedoria que merece ser preservada."}
 };
 const TEST_URL = location.href.split("#")[0].split("?")[0];
+const BOOK_URL = "https://flpgonzaga.github.io/por-que-pessoas-inteligentes-discordam/";
+const WORKS = {
+  "Marx":"O Manifesto Comunista (1848, com Engels)",
+  "Chomsky":"A Manipulação do Público (1988, com Edward Herman)",
+  "Piketty":"O Capital no Século XXI (2013)",
+  "Rawls":"Uma Teoria da Justiça (1971)",
+  "Rousseau":"Do Contrato Social (1762)",
+  "Locke":"Segundo Tratado sobre o Governo Civil (1689)",
+  "Vargas Llosa":"O Chamado da Tribo (2018)",
+  "Hayek":"O Caminho da Servidão (1944)",
+  "Friedman":"Capitalismo e Liberdade (1962)",
+  "Sowell":"Conflito de Visões (1987)",
+  "Burke":"Reflexões sobre a Revolução em França (1790)"
+};
 const ROMAN = n=>["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX"][n-1];
 
 let answers = new Array(Q.length).fill(null), pos = 0, R = null, locked=false, mode="short";
@@ -373,16 +392,19 @@ function finish(){
     <div class="match"><div class="row"><strong>${t.name}</strong><span class="pct">${t.pct}% de afinidade</span></div>
     <p>${t.txt}</p></div>`).join("");
 
-  const far = R.t[R.t.length-1].name;
+  const near = R.t[0].name, far = R.t[R.t.length-1].name;
+  const rec = (lbl,html)=>`<p><span class="lbl">${lbl}</span>${html}</p>`;
+  $("readrec").innerHTML =
+    rec("Pra conhecer melhor quem pensa parecido com você", `${near}, <span class="w">${WORKS[near]}</span>.`) +
+    rec("Pra testar suas convicções com quem pensa o contrário", `${far}, <span class="w">${WORKS[far]}</span>. Leia com a pergunta: o que ele viu que eu não vi?`) +
+    rec("Pra ver os dois lados de cada disputa, começando pela sua", `<span class="w">Por que pessoas inteligentes discordam</span>, a partir do capítulo sobre ${sa.tema}. <a href="${BOOK_URL}" target="_blank" rel="noopener">Leia grátis aqui</a>.`);
   if(centro){
     $("bookhook").textContent = "Onde vale olhar com mais atenção";
     $("booktext").textContent = `Perto do centro, o risco é não ter ouvido de verdade nenhum dos lados. ${far} é o pensador mais distante de você no mapa: um bom lugar para começar a testar o que você acha que pensa.`;
-    $("readrec").textContent = `Pro seu perfil: comece pelo capítulo sobre ${sa.tema}, o eixo em que você mais se moveu, e procure os trechos de ${far}, que chegou a conclusões bem distantes das suas.`;
   } else {
     const side = s[k0]<0?sa.negA:sa.posA;
     $("bookhook").textContent = "Onde vale olhar o outro lado";
     $("booktext").textContent = `Sua posição mais marcada é sobre ${sa.tema}, puxando para ${side}. É justamente aí que vale conhecer os argumentos mais fortes de quem pensa o contrário. ${far} é o pensador mais distante de você no mapa, e pouca coisa testa tanto uma convicção quanto alguém que discorda dela com boas razões.`;
-    $("readrec").textContent = `Pro seu perfil: comece pelo capítulo sobre ${sa.tema}, a disputa em que sua posição é mais firme, e leia os trechos de ${far} com a pergunta "o que ele viu que eu não vi?".`;
   }
   $("waShort").href = "https://wa.me/?text=" + encodeURIComponent(shortText());
   $("waFull").href = "https://wa.me/?text=" + encodeURIComponent(fullText());
@@ -438,6 +460,10 @@ function fullText(){
   R.t.slice(0,3).forEach((t,i)=>L.push(`${i+1}. *${t.name}*, ${t.pct}% de afinidade. O teste diz: “${t.txt}”`));
   const far=R.t[R.t.length-1].name;
   L.push("",`_Onde vale olhar o outro lado:_ ${centro ? `perto do centro, o risco é não ter ouvido de verdade nenhum dos lados.` : `minha posição mais marcada é sobre ${sa.tema}.`} O pensador mais distante de mim no mapa é ${far}.`);
+  L.push("","*Sugestão de leitura*");
+  L.push(`• ${R.t[0].name}: _${WORKS[R.t[0].name]}_`);
+  L.push(`• ${far}: _${WORKS[far]}_`);
+  L.push(`• _Por que pessoas inteligentes discordam_, o livro por trás do teste. Leia grátis: ${BOOK_URL}`);
   L.push("","E você, onde fica no mapa? São 30 afirmações, uns 5 minutos. Faz o teste e me conta o seu resultado 👇",TEST_URL);
   return L.join("\n");
 }
