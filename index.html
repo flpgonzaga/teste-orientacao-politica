@@ -101,21 +101,16 @@ svg text{font-family:"Source Serif 4",Georgia,serif}
 .hook h3{margin:0 0 8px}
 .hook p{margin:0;font-size:1.04rem}
 
-/* reading */
-.book{display:grid;grid-template-columns:104px 1fr;gap:20px;align-items:start}
-.cover{aspect-ratio:2/3;background:var(--ink);color:var(--bg);padding:12px 10px;display:flex;flex-direction:column;justify-content:space-between;border-right:4px solid var(--accent)}
-.cover .t{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.02rem;line-height:1.08}
-.cover .au{font-size:.66rem;opacity:.85}
-.book .t{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.7rem;line-height:1.04;margin:0 0 4px}
-.book .au{color:var(--ink-2);margin:0 0 12px;font-size:.92rem}
-.book p{font-size:1rem}
-.book .rec{border-left:2px solid var(--accent);padding-left:14px;margin-top:18px}
-.book .rec p{margin:0 0 12px}
-.book .rec p:last-child{margin:0}
-.book .rec .w{font-style:italic}
-.book .rec a{color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:4px}
-.book .rec .lbl{display:block;font-size:.82rem;color:var(--ink-2);margin-bottom:2px}
-@media (max-width:380px){.book{grid-template-columns:84px 1fr}}
+/* reading list */
+.read{display:grid;grid-template-columns:34px 1fr;gap:4px 14px;padding:22px 0;border-top:1px solid var(--line-2)}
+.read .n{font-family:"Cormorant Garamond",serif;font-size:1.6rem;font-weight:600;color:var(--accent);line-height:1}
+.read .lbl{font-size:.84rem;color:var(--ink-2)}
+.read .t{grid-column:2;font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.55rem;line-height:1.08;margin:2px 0 2px}
+.read .t em{font-style:italic;font-weight:500}
+.read .by{grid-column:2;font-size:.9rem;color:var(--ink-2);margin:0 0 6px}
+.read p{grid-column:2;margin:0;font-size:.98rem}
+.read.book{margin-top:10px;padding:22px 20px;background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--accent)}
+.read .cta{grid-column:2;margin-top:14px;display:inline-block;justify-self:start;background:var(--ink);color:var(--bg);padding:12px 20px;font-weight:600;font-size:.95rem;text-decoration:none;border-radius:4px}
 
 .share h3{margin-top:0}
 .share .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
@@ -193,19 +188,9 @@ svg text{font-family:"Source Serif 4",Georgia,serif}
 
   <div class="sec">
     <p class="k">Sugestão de leitura</p>
-    <div class="book">
-      <div class="cover" aria-hidden="true">
-        <div class="t">Por que pessoas inteligentes discordam</div>
-        <div class="au">Felipe</div>
-      </div>
-      <div>
-        <p class="t">Por que pessoas inteligentes discordam</p>
-        <p class="au">Felipe · leitura gratuita online</p>
-        <p>Um livro para quem não é especialista e quer entender por que pessoas igualmente inteligentes e bem-intencionadas chegam a conclusões tão diferentes sobre o Estado, a liberdade, a igualdade e a tradição.</p>
-        <p>Cada capítulo toma uma dessas disputas, apresenta os argumentos mais fortes de cada lado sem caricatura e termina com situações do Brasil de hoje, pra você testar o que pensa e ouvir os pensadores deste mapa na voz deles.</p>
-        <div class="rec" id="readrec"></div>
-      </div>
-    </div>
+    <h2>Três leituras pro seu perfil</h2>
+    <p class="muted small">Uma pra se reconhecer, uma pra se testar e uma pra ver as duas coisas ao mesmo tempo.</p>
+    <div id="reading"></div>
   </div>
 
   <div class="sec share">
@@ -393,11 +378,19 @@ function finish(){
     <p>${t.txt}</p></div>`).join("");
 
   const near = R.t[0].name, far = R.t[R.t.length-1].name;
-  const rec = (lbl,html)=>`<p><span class="lbl">${lbl}</span>${html}</p>`;
-  $("readrec").innerHTML =
-    rec("Pra conhecer melhor quem pensa parecido com você", `${near}, <span class="w">${WORKS[near]}</span>.`) +
-    rec("Pra testar suas convicções com quem pensa o contrário", `${far}, <span class="w">${WORKS[far]}</span>. Leia com a pergunta: o que ele viu que eu não vi?`) +
-    rec("Pra ver os dois lados de cada disputa, começando pela sua", `<span class="w">Por que pessoas inteligentes discordam</span>, a partir do capítulo sobre ${sa.tema}. <a href="${BOOK_URL}" target="_blank" rel="noopener">Leia grátis aqui</a>.`);
+  const split = w=>{const m=w.match(/^(.*?)\s*\((.*)\)$/);return m?[m[1],m[2]]:[w,""]};
+  const [w1,y1]=split(WORKS[near]), [w2,y2]=split(WORKS[far]);
+  $("reading").innerHTML = `
+    <div class="read"><span class="n">1</span><span class="lbl">Pra se reconhecer</span>
+      <p class="t"><em>${w1}</em></p><p class="by">${near}, ${y1}</p>
+      <p>O pensador mais próximo de você no mapa, na obra em que ele expõe a ideia que vocês têm em comum.</p></div>
+    <div class="read"><span class="n">2</span><span class="lbl">Pra se testar</span>
+      <p class="t"><em>${w2}</em></p><p class="by">${far}, ${y2}</p>
+      <p>O mais distante de você. Leia com uma pergunta na cabeça: o que ele viu que eu não vi?</p></div>
+    <div class="read book"><span class="n">3</span><span class="lbl">Pra ver os dois lados de cada disputa</span>
+      <p class="t"><em>Por que pessoas inteligentes discordam</em></p><p class="by">Felipe, leitura gratuita online</p>
+      <p>Um livro para quem não é especialista. Cada capítulo toma uma disputa, apresenta os argumentos mais fortes de cada lado sem caricatura e termina com situações do Brasil de hoje. Pro seu perfil, comece pelo capítulo sobre ${sa.tema}.</p>
+      <a class="cta" href="${BOOK_URL}" target="_blank" rel="noopener">Ler grátis</a></div>`;
   if(centro){
     $("bookhook").textContent = "Onde vale olhar com mais atenção";
     $("booktext").textContent = `Perto do centro, o risco é não ter ouvido de verdade nenhum dos lados. ${far} é o pensador mais distante de você no mapa: um bom lugar para começar a testar o que você acha que pensa.`;
