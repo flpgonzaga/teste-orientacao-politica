@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onde você está no mapa das ideias?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E6E2D8; --panel:#EFECE4; --ink:#1C1E26; --ink-2:#5E6068; --line:#C7C1B2; --line-2:#D9D4C7;
+  --a:#3A6C62; --b:#9C6F22; --accent:#B08D3C;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15171D; --panel:#1E2128; --ink:#E8E4D8; --ink-2:#A3A196; --line:#3C3F49; --line-2:#2B2E36;
+    --a:#7FB5A8; --b:#D5A650; --accent:#C9A85C; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15171D; --panel:#1E2128; --ink:#E8E4D8; --ink-2:#A3A196; --line:#3C3F49; --line-2:#2B2E36;
+  --a:#7FB5A8; --b:#D5A650; --accent:#C9A85C; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Serif 4",Georgia,"Times New Roman",serif;font-size:17.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+main{max-width:580px;margin:0 auto;padding:44px 22px 64px}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600}
+h1{font-size:clamp(2.6rem,10.5vw,3.8rem);line-height:.98;letter-spacing:-.01em;margin:0 0 22px;text-wrap:balance}
+h1 em{font-style:italic;font-weight:500}
+h2{font-size:2.1rem;line-height:1.04;margin:0 0 10px}
+h3{font-size:1.55rem;line-height:1.1;margin:34px 0 8px}
+p{margin:0 0 14px}
+.lead{font-size:1.12rem;line-height:1.5}
+.muted{color:var(--ink-2)} .small{font-size:.92rem}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.primary{display:block;width:100%;text-align:center;background:var(--ink);color:var(--bg);border-radius:4px;padding:16px 24px;font-weight:600;font-size:1.02rem;text-decoration:none}
+.ghost{display:block;text-align:center;border:1px solid var(--line);border-radius:4px;padding:14px 18px;font-size:.98rem;text-decoration:none;color:var(--ink);background:transparent}
+.hidden{display:none!important}
+.sec{margin-top:64px;padding-top:24px;border-top:1px solid var(--ink)}
+.sec .k{font-family:"Cormorant Garamond",serif;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);margin:0 0 16px}
+
+/* intro */
+.axes-intro{margin:26px 0 30px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.axes-intro div{display:grid;grid-template-columns:1fr 1.2fr 1fr;align-items:center;padding:13px 0;font-size:1rem}
+.axes-intro div+div{border-top:1px solid var(--line-2)}
+.axes-intro .c{text-align:center;color:var(--ink-2);font-family:"Cormorant Garamond",serif;font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase}
+.axes-intro .l{color:var(--a);font-weight:600}
+.axes-intro .r{color:var(--b);font-weight:600;text-align:right}
+.rules{margin:0 0 32px;padding:0;list-style:none;color:var(--ink-2);font-size:1rem}
+.rules li{padding:8px 0 8px 20px;position:relative}
+.rules li::before{content:"";position:absolute;left:0;top:18px;width:9px;height:1px;background:var(--accent)}
+
+/* question */
+.qtop{display:flex;justify-content:space-between;align-items:center}
+.qtop .ghost{width:auto;padding:9px 16px;font-size:.92rem}
+.qnum{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:.95rem}
+.progress{height:1px;background:var(--line);margin:18px 0 0;position:relative}
+.progress i{position:absolute;top:-1px;left:0;height:3px;background:var(--ink);width:0;transition:width .3s}
+.statement{font-family:"Source Serif 4",Georgia,serif;font-weight:500;font-size:clamp(1.55rem,5.8vw,2rem);line-height:1.32;margin:56px 0 60px;min-height:6em;text-wrap:pretty}
+.statement::before{content:"";display:block;width:28px;height:2px;background:var(--accent);margin-bottom:22px}
+.scale{display:flex;justify-content:space-between;align-items:center;padding:0 2px}
+.dot{border-radius:50%;border:1.5px solid var(--ink);background:transparent;flex:0 0 auto;transition:transform .12s,background .12s}
+.dot:hover{transform:scale(1.06)}
+.dot[data-v="-2"],.dot[data-v="2"]{width:58px;height:58px}
+.dot[data-v="-1"],.dot[data-v="1"]{width:44px;height:44px}
+.dot[data-v="0"]{width:30px;height:30px;border-color:var(--ink-2)}
+.dot.on{background:var(--ink)} .dot.on[data-v="0"]{background:var(--ink-2)}
+.scalelabels{display:flex;justify-content:space-between;margin-top:14px;font-size:.86rem;color:var(--ink-2)}
+.scalelabels span:nth-child(2){text-align:center}
+.scalelabels span:last-child{text-align:right}
+
+/* axes */
+.axis{padding:22px 0 20px;border-top:1px solid var(--line-2)}
+.axis:first-child{border-top:0}
+.axis .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.axis .name{font-family:"Cormorant Garamond",serif;font-size:1.4rem;font-weight:600}
+.axis .verdict{font-size:.92rem;color:var(--ink-2);text-align:right}
+.ruler{display:block;width:100%;height:auto;margin:10px 0 0}
+.ends{display:flex;justify-content:space-between;font-size:.9rem;margin-top:2px}
+.ends span:first-child{color:var(--a)} .ends span:last-child{color:var(--b)}
+
+/* maps */
+.plate{background:var(--panel);border:1px solid var(--line);padding:10px 6px 4px;margin:18px 0 0}
+.plate svg{display:block;width:100%;height:auto}
+svg text{font-family:"Source Serif 4",Georgia,serif}
+
+/* matches */
+.match{padding:20px 0;border-top:1px solid var(--line-2)}
+.match .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.match strong{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.65rem;line-height:1}
+.match .pct{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:.88rem;white-space:nowrap}
+.match p{margin:8px 0 0;font-size:1rem;line-height:1.55}
+.note{font-size:.86rem;color:var(--ink-2);margin-top:16px}
+
+.hook{margin-top:40px;padding:22px 0 0;border-top:1px solid var(--accent)}
+.hook h3{margin:0 0 8px}
+.hook p{margin:0;font-size:1.04rem}
+
+/* reading */
+.book{display:grid;grid-template-columns:104px 1fr;gap:20px;align-items:start}
+.cover{aspect-ratio:2/3;background:var(--ink);color:var(--bg);padding:12px 10px;display:flex;flex-direction:column;justify-content:space-between;border-right:4px solid var(--accent)}
+.cover .t{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.02rem;line-height:1.08}
+.cover .au{font-size:.66rem;opacity:.85}
+.book .t{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.7rem;line-height:1.04;margin:0 0 4px}
+.book .au{color:var(--ink-2);margin:0 0 12px;font-size:.92rem}
+.book p{font-size:1rem}
+.book .rec{border-left:2px solid var(--accent);padding-left:12px;margin-top:14px}
+@media (max-width:380px){.book{grid-template-columns:84px 1fr}}
+
+.share h3{margin-top:0}
+.share .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.wa{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--ink);color:var(--bg);border-radius:4px;padding:16px 14px;font-weight:600;font-size:1.02rem;text-decoration:none}
+.wa svg{width:22px;height:22px;fill:currentColor;flex:0 0 auto}
+.foot{text-align:center;margin:40px 0 0}
+.link{color:var(--ink-2);text-decoration:underline;text-underline-offset:4px;font-size:.98rem}
+.link:hover{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+
+<section id="intro">
+  <h1>Onde você está no <em>mapa das ideias?</em></h1>
+  <p class="lead">Trinta afirmações, uns cinco minutos. No fim, você descobre de quais partidos brasileiros e de quais pensadores suas ideias se aproximam, e por quê.</p>
+  <div class="axes-intro" aria-label="Os três eixos do teste">
+    <div><span class="l">Estado</span><span class="c">Economia</span><span class="r">Mercado</span></div>
+    <div><span class="l">Liberdade</span><span class="c">Autoridade</span><span class="r">Ordem</span></div>
+    <div><span class="l">Mudança</span><span class="c">Cultura</span><span class="r">Tradição</span></div>
+  </div>
+  <ul class="rules">
+    <li>Não existe resposta certa. Responda o que você pensa, não o que acha que deveria pensar.</li>
+    <li>Se uma afirmação parecer incompleta, responda pelo que ela diz, sem completar com o que imagina por trás.</li>
+    <li>O resultado aproxima, não rotula. Ninguém cabe inteiro em três eixos.</li>
+  </ul>
+  <button class="primary" id="start">Começar o teste</button>
+</section>
+
+<section id="quiz" class="hidden">
+  <div class="qtop">
+    <button class="ghost" id="back">Voltar</button>
+    <span class="qnum" id="count"></span>
+  </div>
+  <div class="progress"><i id="bar"></i></div>
+  <p class="statement" id="statement" aria-live="polite"></p>
+  <div class="scale" id="scale" role="group" aria-label="Quanto você concorda">
+    <button class="dot" data-v="-2" aria-label="Discordo totalmente"></button>
+    <button class="dot" data-v="-1" aria-label="Discordo"></button>
+    <button class="dot" data-v="0" aria-label="Nem concordo nem discordo"></button>
+    <button class="dot" data-v="1" aria-label="Concordo"></button>
+    <button class="dot" data-v="2" aria-label="Concordo totalmente"></button>
+  </div>
+  <div class="scalelabels"><span>Discordo<br>totalmente</span><span>Nem um,<br>nem outro</span><span>Concordo<br>totalmente</span></div>
+</section>
+
+<section id="result" class="hidden">
+  <h1>Seu mapa</h1>
+  <p class="lead" id="rlead"></p>
+  <div id="axes" style="margin-top:34px"></div>
+
+  <div class="sec">
+    <p class="k">Partidos</p>
+    <h2>Entre os partidos brasileiros</h2>
+    <p class="muted small">Economia na horizontal, cultura na vertical: os dois eixos que mais separam os partidos no Brasil. O ponto cheio é você.</p>
+    <div class="plate"><svg id="mapP" viewBox="0 0 340 340" role="img" aria-label="Mapa com sua posição entre os partidos"></svg></div>
+    <h3>Partidos de que seu perfil se aproxima</h3>
+    <div id="parties"></div>
+    <p class="note">As posições dos partidos vêm de votações na Câmara e de pesquisas acadêmicas até 2025 e serão revistas após as eleições de 2026. Afinidade descreve, não recomenda voto.</p>
+  </div>
+
+  <div class="sec">
+    <p class="k">Pensadores</p>
+    <h2>Entre os pensadores</h2>
+    <p class="muted small">Os mesmos dois eixos, agora com alguns dos autores que deram forma a essas disputas ao longo de três séculos.</p>
+    <div class="plate"><svg id="mapT" viewBox="0 0 340 340" role="img" aria-label="Mapa com sua posição entre os pensadores"></svg></div>
+    <h3>Pensadores com quem você pensa parecido</h3>
+    <div id="thinkers"></div>
+    <div class="hook">
+      <h3 id="bookhook"></h3>
+      <p id="booktext"></p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <p class="k">Sugestão de leitura</p>
+    <div class="book">
+      <div class="cover" aria-hidden="true">
+        <div class="t">Por que pessoas inteligentes discordam</div>
+        <div class="au">Felipe</div>
+      </div>
+      <div>
+        <p class="t">Por que pessoas inteligentes discordam</p>
+        <p class="au">Felipe · lançamento em breve</p>
+        <p>Um livro para quem não é especialista e quer entender por que pessoas igualmente inteligentes e bem-intencionadas chegam a conclusões tão diferentes sobre o Estado, a liberdade, a igualdade e a tradição.</p>
+        <p>Cada capítulo toma uma dessas disputas, apresenta os argumentos mais fortes de cada lado sem caricatura e termina com situações do Brasil de hoje, pra você testar o que pensa e ouvir os pensadores deste mapa na voz deles.</p>
+        <p class="rec" id="readrec"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec share">
+    <h3>Compartilhe com os amigos</h3>
+    <p class="muted small">Abre o WhatsApp com a mensagem pronta, no tamanho que você preferir.</p>
+    <div class="pair">
+      <a class="wa" id="waShort" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4 8.1 8.1 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3 4.3c-.2 0-.5 0-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5-.1 1.7-.7 2-1.4.2-.7.2-1.3.1-1.4l-.5-.3-1.9-.9c-.3-.1-.5-.1-.6.1l-.9 1.1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.4-3c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.5l-.9-2c-.2-.5-.4-.5-.6-.5H9z"/></svg><span>Resumido</span></a>
+      <a class="wa" id="waFull" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 1.8a8.2 8.2 0 0 1 0 16.4 8.1 8.1 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8zm-3 4.3c-.2 0-.5 0-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5-.1 1.7-.7 2-1.4.2-.7.2-1.3.1-1.4l-.5-.3-1.9-.9c-.3-.1-.5-.1-.6.1l-.9 1.1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.4-3c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.5l-.9-2c-.2-.5-.4-.5-.6-.5H9z"/></svg><span>Completo</span></a>
+    </div>
+  </div>
+  <p class="foot"><button class="link" id="restart">Refazer o teste</button></p>
+</section>
+
+</main>
+<script>
+
+const Q = [
+ ["E","O livre mercado distribui recursos melhor do que qualquer planejamento feito pelo governo.",1],
+ ["E","Impostos muito altos sobre os mais ricos acabam prejudicando quem gera emprego.",1],
+ ["E","Empresas privadas costumam prestar serviços melhores do que empresas estatais.",1],
+ ["E","O salário mínimo deveria ser definido pelo mercado, não pelo governo.",1],
+ ["E","Impostos deveriam ser proporcionalmente iguais para todos, e não maiores para quem ganha mais.",1],
+ ["E","Grandes empresas têm influência demais sobre a nossa vida.",-1],
+ ["E","Saúde e educação de qualidade deveriam ser garantidas pelo Estado a todos, de graça.",-1],
+ ["E","Setores estratégicos, como energia e petróleo, deveriam ficar nas mãos do Estado.",-1],
+ ["E","Reduzir a desigualdade de renda é uma obrigação do governo.",-1],
+ ["E","Sem regras fortes, o mercado tende a explorar trabalhadores e consumidores.",-1],
+ ["A","Em tempos de crise, o governo deve poder restringir algumas liberdades individuais.",1],
+ ["A","Penas mais duras são o caminho mais eficaz para reduzir a criminalidade.",1],
+ ["A","Um país precisa de líderes firmes, mesmo que isso signifique menos debate.",1],
+ ["A","O Estado deveria poder monitorar comunicações privadas para combater o crime organizado.",1],
+ ["A","As plataformas digitais deveriam ser obrigadas a remover conteúdos considerados desinformação.",1],
+ ["A","O que um adulto faz com a própria vida, sem prejudicar ninguém, não é assunto do Estado.",-1],
+ ["A","Cidadãos comuns deveriam ter o direito de possuir armas para se defender.",-1],
+ ["A","Liberdade de expressão inclui o direito de dizer coisas que ofendem.",-1],
+ ["A","Quanto menos o governo souber sobre a vida de cada pessoa, melhor.",-1],
+ ["A","Protestos e greves são legítimos mesmo quando atrapalham a rotina da cidade.",-1],
+ ["C","A família tradicional é a base de uma sociedade saudável.",1],
+ ["C","Mudanças sociais muito rápidas costumam trazer mais problemas do que soluções.",1],
+ ["C","Costumes que sobreviveram por séculos guardam uma sabedoria que não deve ser descartada à toa.",1],
+ ["C","A religião tem um papel importante na formação moral das pessoas.",1],
+ ["C","A escola deveria ensinar conteúdo e deixar a formação de valores para as famílias.",1],
+ ["C","Muitas tradições existem para manter os privilégios de alguns grupos.",-1],
+ ["C","A sociedade deveria aceitar melhor as diferentes formas de família.",-1],
+ ["C","Cotas e ações afirmativas são necessárias para corrigir injustiças históricas.",-1],
+ ["C","O progresso moral depende de questionar costumes antigos.",-1],
+ ["C","A decisão sobre o aborto deveria caber à mulher.",-1]
+];
+const ORDER = (()=>{let a=[...Q.keys()],s=7;for(let i=a.length-1;i>0;i--){s=(s*9301+49297)%233280;const j=Math.floor(s/233280*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a})();
+
+const THINKERS = [
+ ["Marx",-95,10,-80,"Você tende a ver a desigualdade como produto da forma como a economia se organiza, não como acidente. Marx levou essa ideia até o fim: enquanto poucos forem donos dos meios de produção, a liberdade da maioria será mais formal que real."],
+ ["Chomsky",-70,-75,-60,"Você desconfia de poder concentrado, venha ele de governos ou de grandes empresas. Chomsky passou a vida mostrando como essas duas formas de poder moldam o que a gente acha normal."],
+ ["Piketty",-60,-10,-40,"Pra você, desigualdade não é lei da natureza, é resultado de escolhas políticas. Piketty reuniu dois séculos de dados para defender que impostos e instituições podem mudar essa curva."],
+ ["Rawls",-40,-45,-35,"Você aceita alguma desigualdade, desde que ela funcione a favor de quem está pior. Rawls propôs um teste: que regras você escolheria se não soubesse em que lugar da sociedade iria nascer?"],
+ ["Rousseau",-45,40,-10,"Você valoriza a comunidade e desconfia de um progresso que deixa muita gente pra trás. Rousseau via na vontade geral, e não na soma dos interesses privados, a base de uma sociedade justa."],
+ ["Locke",50,-55,15,"Pra você, há direitos que vêm antes do governo, e o governo existe para protegê-los. Locke deu forma a essa ideia: vida, liberdade e propriedade, com um poder que depende do consentimento de quem é governado."],
+ ["Vargas Llosa",60,-60,-20,"Você combina defesa do mercado com abertura nos costumes e desconfiança de líderes que prometem salvar a nação. Vargas Llosa fez esse percurso, saindo do marxismo até chegar ao liberalismo clássico."],
+ ["Hayek",85,-55,0,"Você desconfia de quem acha que pode planejar a sociedade de cima. Hayek argumentou que nenhum planejador reúne o conhecimento espalhado entre milhões de pessoas, e que o mercado faz isso melhor."],
+ ["Friedman",95,-65,-15,"Você leva a liberdade de escolha a sério, na economia e na vida pessoal. Friedman defendia que boa parte dos problemas atribuídos ao mercado nasce de intervenções do governo."],
+ ["Sowell",80,10,45,"Você acha que a natureza humana tem limites que nenhuma reforma apaga, e prefere arranjos testados pela experiência. Sowell mostrou como esse conflito de visões explica boa parte das brigas políticas."],
+ ["Burke",35,35,90,"Pra você, instituições e costumes antigos carregam uma sabedoria que nenhuma geração sozinha produziria. Burke defendia reformar devagar e conservar o que funciona, e via na revolução um salto no escuro."]
+];
+const PARTIES = [
+ ["PSOL",-85,-45,-85,"defende ampliação de direitos sociais, descriminalização das drogas e pautas feministas e LGBT, e votou contra as reformas trabalhista e da previdência."],
+ ["PT",-60,-10,-50,"defende o Estado como indutor do desenvolvimento e os programas de transferência de renda, votou contra as reformas trabalhista e da previdência e apoiou a regulação das plataformas digitais."],
+ ["PDT",-45,-5,-30,"tem tradição trabalhista e nacional-desenvolvimentista, defende o papel do Estado na economia e votou com a esquerda em direitos trabalhistas e indígenas."],
+ ["PSB",-35,-10,-35,"é de centro-esquerda, combina defesa de políticas sociais com posições fiscais mais moderadas e votou contra o marco temporal."],
+ ["MDB",25,15,20,"é um partido de centro que apoiou as reformas de mercado de 2016 a 2019 e também a agenda fiscal de 2023, com bancada dividida em temas de costumes."],
+ ["PSD",30,20,20,"vota de forma pragmática, entre o centro e a centro-direita, apoiando reformas econômicas e alternando posições em pautas culturais."],
+ ["União Brasil",45,35,40,"é de centro-direita liberal-conservadora e apoiou reformas de mercado, o marco temporal e o endurecimento penal."],
+ ["PP",45,40,45,"é de direita e votou a favor das reformas trabalhista e previdenciária, do marco temporal e de propostas de endurecimento penal."],
+ ["Republicanos",40,45,65,"associa liberalismo econômico moderado à defesa de valores cristãos e da família tradicional, com uma agenda de segurança pública mais rígida."],
+ ["PL",55,45,80,"é o principal partido de oposição conservadora, defende valores tradicionais, acesso mais amplo a armas e penas mais duras."],
+ ["Novo",90,5,45,"defende redução do Estado, privatizações e responsabilidade fiscal, votando contra aumentos de gasto e de carga tributária."]
+];
+const AXES = {
+ E:{name:"Economia",neg:"Estado",pos:"Mercado",negA:"o Estado",posA:"o mercado",tema:"o papel do Estado na economia",
+    negTxt:"Você confia mais no Estado do que no mercado para corrigir injustiças e organizar a economia.",
+    posTxt:"Você confia mais no mercado do que no governo para gerar prosperidade e distribuir recursos."},
+ A:{name:"Autoridade",neg:"Liberdade",pos:"Ordem",negA:"a liberdade",posA:"a ordem",tema:"a liberdade individual diante do poder do Estado",
+    negTxt:"Você protege a liberdade individual mesmo quando isso custa alguma ordem ou segurança.",
+    posTxt:"Você aceita mais poder nas mãos do Estado quando o objetivo é ordem e segurança."},
+ C:{name:"Cultura",neg:"Mudança",pos:"Tradição",negA:"a mudança",posA:"a tradição",tema:"tradição e mudança",
+    negTxt:"Você vê nos costumes herdados algo a ser questionado e reformado.",
+    posTxt:"Você vê nos costumes herdados uma sabedoria que merece ser preservada."}
+};
+const TEST_URL = location.href.split("#")[0].split("?")[0];
+const ROMAN = n=>["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX"][n-1];
+
+let answers = new Array(Q.length).fill(null), pos = 0, R = null, locked=false, mode="short";
+const $ = id => document.getElementById(id);
+function view(id){["intro","quiz","result"].forEach(s=>$(s).classList.toggle("hidden",s!==id));window.scrollTo(0,0)}
+
+function renderQ(){
+  const q = Q[ORDER[pos]];
+  $("statement").textContent = q[1];
+  $("count").textContent = `${pos+1} de ${Q.length}`;
+  $("bar").style.width = (pos/Q.length*100)+"%";
+  document.querySelectorAll(".dot").forEach(d=>d.classList.toggle("on",answers[ORDER[pos]]===+d.dataset.v));
+}
+document.querySelectorAll(".dot").forEach(d=>d.addEventListener("click",()=>{
+  if(locked) return; locked=true;
+  answers[ORDER[pos]] = +d.dataset.v;
+  document.querySelectorAll(".dot").forEach(x=>x.classList.toggle("on",x===d));
+  setTimeout(()=>{locked=false; if(pos<Q.length-1){pos++;renderQ()} else finish()},220);
+}));
+$("back").onclick = ()=>{ if(pos>0){pos--;renderQ()} else view("intro") };
+$("start").onclick = ()=>{pos=0;view("quiz");renderQ()};
+$("restart").onclick = ()=>{answers.fill(null);pos=0;view("intro")};
+
+function score(){
+  const s={E:0,A:0,C:0};
+  Q.forEach((q,i)=>{s[q[0]]+= (answers[i]||0)*q[2]});
+  for(const k in s) s[k]=Math.round(s[k]/20*100);
+  return s;
+}
+function nearest(list,s,w){
+  const dmax = Math.sqrt(w.E*40000+w.A*40000+w.C*40000);
+  return list.map(x=>{
+    const d=Math.sqrt(w.E*(x[1]-s.E)**2+w.A*(x[2]-s.A)**2+w.C*(x[3]-s.C)**2);
+    return {name:x[0],E:x[1],A:x[2],C:x[3],txt:x[4],pct:Math.max(0,Math.round(100-d/dmax*160))};
+  }).sort((a,b)=>b.pct-a.pct);
+}
+function grade(v){const a=Math.abs(v);return a<15?0:a<40?1:a<70?2:3}
+function verdict(v,ax){
+  const g=grade(v); if(!g) return "Equilíbrio";
+  const side=v<0?ax.negA:ax.posA;
+  return ["","Leve inclinação para ","Inclinação clara para ","Forte inclinação para "][g]+side;
+}
+function phrase(v,ax){
+  const g=grade(v); if(!g) return "fica perto do equilíbrio";
+  const side=v<0?ax.negA:ax.posA;
+  return ["","inclina um pouco para ","inclina claramente para ","inclina com força para "][g]+side;
+}
+function ruler(v){
+  const W=340,P=8,inner=W-2*P,y=30;
+  let t=`<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="var(--line)" stroke-width="2" stroke-linecap="round"/>`;
+  t+=`<line x1="${W/2}" y1="${y-5}" x2="${W/2}" y2="${y+5}" stroke="var(--line)" stroke-width="1.5"/>`;
+  const x=P+(v+100)/200*inner, c=v<-14?"var(--a)":v>14?"var(--b)":"var(--ink-2)";
+  t+=`<line x1="${W/2}" y1="${y}" x2="${x}" y2="${y}" stroke="${c}" stroke-width="2" stroke-linecap="round"/>`;
+  t+=`<circle cx="${x}" cy="${y}" r="7" fill="${c}" stroke="var(--bg)" stroke-width="2.5"/>`;
+  t+=`<text x="${x}" y="${y-15}" font-size="11.5" font-weight="500" text-anchor="middle" fill="var(--ink)">${v>0?"+":""}${v}</text>`;
+  return `<svg class="ruler" viewBox="0 0 ${W} 44" aria-hidden="true">${t}</svg>`;
+}
+
+function finish(){
+  const s = score(); R = {s};
+  R.t = nearest(THINKERS,s,{E:1,A:1,C:1});
+  R.p = nearest(PARTIES,s,{E:.4,A:.2,C:.4});
+  $("bar").style.width="100%";
+
+  $("axes").innerHTML = Object.entries(AXES).map(([k,ax])=>`
+    <div class="axis">
+      <div class="head"><span class="name">${ax.name}</span><span class="verdict">${verdict(s[k],ax)}</span></div>
+      ${ruler(s[k])}
+      <div class="ends"><span>${ax.neg}</span><span>${ax.pos}</span></div>
+    </div>`).join("");
+
+  const keys = Object.keys(AXES).sort((a,b)=>Math.abs(s[b])-Math.abs(s[a]));
+  const k0 = keys[0], sa = AXES[k0], centro = Math.abs(s[k0])<15;
+  $("rlead").textContent = centro
+    ? "Você ficou perto do centro nos três eixos. Pode ser equilíbrio, pode ser que você ainda esteja pesando os argumentos de cada lado. Nos dois casos, o mapa abaixo mostra quem está mais perto de você."
+    : `${s[k0]<0?sa.negTxt:sa.posTxt} ` + keys.slice(1).map(k=>`Em ${AXES[k].name.toLowerCase()}, você ${phrase(s[k],AXES[k])}.`).join(" ");
+
+  $("parties").innerHTML = R.p.slice(0,3).map((p,i)=>`
+    <div class="match"><div class="row"><strong>${p.name}</strong><span class="pct">${p.pct}% de afinidade</span></div>
+    <p>Seu perfil se aproxima do ${p.name}, que ${p.txt}</p></div>`).join("");
+  $("thinkers").innerHTML = R.t.slice(0,3).map((t,i)=>`
+    <div class="match"><div class="row"><strong>${t.name}</strong><span class="pct">${t.pct}% de afinidade</span></div>
+    <p>${t.txt}</p></div>`).join("");
+
+  const far = R.t[R.t.length-1].name;
+  if(centro){
+    $("bookhook").textContent = "Onde vale olhar com mais atenção";
+    $("booktext").textContent = `Perto do centro, o risco é não ter ouvido de verdade nenhum dos lados. ${far} é o pensador mais distante de você no mapa: um bom lugar para começar a testar o que você acha que pensa.`;
+    $("readrec").textContent = `Pro seu perfil: comece pelo capítulo sobre ${sa.tema}, o eixo em que você mais se moveu, e procure os trechos de ${far}, que chegou a conclusões bem distantes das suas.`;
+  } else {
+    const side = s[k0]<0?sa.negA:sa.posA;
+    $("bookhook").textContent = "Onde vale olhar o outro lado";
+    $("booktext").textContent = `Sua posição mais marcada é sobre ${sa.tema}, puxando para ${side}. É justamente aí que vale conhecer os argumentos mais fortes de quem pensa o contrário. ${far} é o pensador mais distante de você no mapa, e pouca coisa testa tanto uma convicção quanto alguém que discorda dela com boas razões.`;
+    $("readrec").textContent = `Pro seu perfil: comece pelo capítulo sobre ${sa.tema}, a disputa em que sua posição é mais firme, e leia os trechos de ${far} com a pergunta "o que ele viu que eu não vi?".`;
+  }
+  $("waShort").href = "https://wa.me/?text=" + encodeURIComponent(shortText());
+  $("waFull").href = "https://wa.me/?text=" + encodeURIComponent(fullText());
+  drawMap("mapP",PARTIES,"sq"); drawMap("mapT",THINKERS,"c"); view("result");
+}
+
+function drawMap(id,items,shape){
+  const s=R.s, W=340, P=36, inner=W-2*P;
+  const X=v=>P+(v+100)/200*inner, Y=v=>P+(100-v)/200*inner;
+  let g=``;
+  for(let i=0;i<=4;i++){const t=P+inner*i/4;g+=`<line x1="${t}" y1="${P}" x2="${t}" y2="${W-P}" stroke="var(--line-2)" stroke-width="1"/><line x1="${P}" y1="${t}" x2="${W-P}" y2="${t}" stroke="var(--line-2)" stroke-width="1"/>`}
+  g += `<line x1="${W/2}" y1="${P}" x2="${W/2}" y2="${W-P}" stroke="var(--line)" stroke-width="1.2"/>
+   <line x1="${P}" y1="${W/2}" x2="${W-P}" y2="${W/2}" stroke="var(--line)" stroke-width="1.2"/>
+   <text x="${P}" y="${W-12}" font-size="11.5" font-weight="500" fill="var(--a)">Estado</text>
+   <text x="${W-P}" y="${W-12}" font-size="11.5" font-weight="500" fill="var(--b)" text-anchor="end">Mercado</text>
+   <text x="${W/2}" y="22" font-size="11.5" font-weight="500" fill="var(--b)" text-anchor="middle">Tradição</text>
+   <text x="${W/2}" y="${W-12}" font-size="11.5" font-weight="500" fill="var(--a)" text-anchor="middle">Mudança</text>`;
+  items.forEach(it=>{
+    const x=X(it[1]), y=Y(it[3]), right = it[1]>60;
+    g += `<circle cx="${x}" cy="${y}" r="4" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.4"/>`;
+    g += `<text x="${right?x-8:x+8}" y="${y+4}" font-size="10.5" fill="var(--ink)" text-anchor="${right?"end":"start"}" style="paint-order:stroke;stroke:var(--panel);stroke-width:3px">${it[0]}</text>`;
+  });
+  const ux=X(s.E), uy=Y(s.C);
+  g += `<circle cx="${ux}" cy="${uy}" r="13" fill="var(--ink)" opacity=".12"/>
+        <circle cx="${ux}" cy="${uy}" r="7" fill="var(--ink)" stroke="var(--panel)" stroke-width="2"/>
+        <text x="${ux}" y="${uy-17}" font-size="12" font-weight="600" fill="var(--ink)" text-anchor="middle" style="paint-order:stroke;stroke:var(--panel);stroke-width:4px">Você</text>`;
+  $(id).innerHTML = g;
+}
+
+function shortText(){
+  const s=R.s, L=[];
+  L.push("Fiz o teste *Onde você está no mapa das ideias?* 🧭","");
+  L.push("*Meu perfil*");
+  for(const k in AXES) L.push(`• ${AXES[k].name}: ${verdict(s[k],AXES[k]).toLowerCase()}`);
+  L.push("","*Partidos mais próximos*");
+  L.push(`${R.p[0].name} (${R.p[0].pct}%), ${R.p[1].name} e ${R.p[2].name}`);
+  L.push("","*Penso parecido com*");
+  L.push(`${R.t[0].name}, ${R.t[1].name} e ${R.t[2].name}`);
+  L.push("","E você, onde fica no mapa? São 30 afirmações, uns 5 minutos. Faz o teste e me conta o seu resultado 👇",TEST_URL);
+  return L.join("\n");
+}
+function fullText(){
+  const s=R.s, L=[];
+  const keys = Object.keys(AXES).sort((a,b)=>Math.abs(s[b])-Math.abs(s[a]));
+  const k0=keys[0], sa=AXES[k0], centro=Math.abs(s[k0])<15;
+  L.push("Fiz o teste *Onde você está no mapa das ideias?* 🧭 e o resultado foi esse:","");
+  L.push("*Meus três eixos*");
+  L.push(centro ? "Fiquei perto do centro nos três eixos." : `O teste resumiu assim: “${s[k0]<0?sa.negTxt:sa.posTxt}”`);
+  for(const k in AXES) L.push(`• ${AXES[k].name} (${AXES[k].neg} ↔ ${AXES[k].pos}): ${verdict(s[k],AXES[k]).toLowerCase()}, ${s[k]>0?"+":""}${s[k]}`);
+  L.push("","*Partidos de que meu perfil se aproxima*");
+  R.p.slice(0,3).forEach((p,i)=>L.push(`${i+1}. *${p.name}*, ${p.pct}% de afinidade. Meu perfil se aproxima do ${p.name}, que ${p.txt}`));
+  L.push("","*Pensadores com quem penso parecido*");
+  R.t.slice(0,3).forEach((t,i)=>L.push(`${i+1}. *${t.name}*, ${t.pct}% de afinidade. O teste diz: “${t.txt}”`));
+  const far=R.t[R.t.length-1].name;
+  L.push("",`_Onde vale olhar o outro lado:_ ${centro ? `perto do centro, o risco é não ter ouvido de verdade nenhum dos lados.` : `minha posição mais marcada é sobre ${sa.tema}.`} O pensador mais distante de mim no mapa é ${far}.`);
+  L.push("","E você, onde fica no mapa? São 30 afirmações, uns 5 minutos. Faz o teste e me conta o seu resultado 👇",TEST_URL);
+  return L.join("\n");
+}
+</script>
+</body>
+</html>
